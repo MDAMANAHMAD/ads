@@ -1,0 +1,428 @@
+################################################################################
+# EXPERIMENT 1: DESCRIPTIVE AND INFERENTIAL STATISTICS
+# Dataset: olympics.csv
+################################################################################
+
+import pandas as pd
+import scipy.stats as stats
+
+# skiprows=1 because the image shows headers start on the second row
+df = pd.read_csv('olympics.csv', skiprows=1)
+
+# Descriptive Statistics
+print("--- Experiment 1: Descriptive Statistics ---")
+print(df['Combined total'].describe())
+
+# Inferential Statistics (T-Test)
+# Testing if the average medals won is significantly different from 50
+t_stat, p_val = stats.ttest_1samp(df['Combined total'].dropna(), popmean=50)
+print("\n--- Experiment 1: Inferential Statistics ---")
+print(f"T-statistic: {t_stat}")
+print(f"P-value: {p_val}")
+# Inference: If p_val < 0.05, the difference is statistically significant.
+
+
+################################################################################
+# EXPERIMENT 2: SMOTE TECHNIQUE (SYNTHETIC DATA GENERATION)
+# Dataset: diabetes.csv
+################################################################################
+
+import pandas as pd
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import f1_score
+
+df = pd.read_csv('diabetes.csv')
+X = df.drop('Outcome', axis=1)
+y = df['Outcome']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Before SMOTE
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+print("\n--- Experiment 2: SMOTE Technique ---")
+print("F1-score Before SMOTE:", f1_score(y_test, model.predict(X_test)))
+
+# Applying SMOTE
+sm = SMOTE(random_state=42)
+X_res, y_res = sm.fit_resample(X_train, y_train)
+
+# After SMOTE
+model.fit(X_res, y_res)
+print("F1-score After SMOTE:", f1_score(y_test, model.predict(X_test)))
+
+
+################################################################################
+# EXPERIMENT 3: DISTANCE-BASED OUTLIER DETECTION
+# Dataset: olympics.csv
+################################################################################
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('olympics.csv', skiprows=1)
+data_col = df['Combined total']
+
+print("\n--- Experiment 3: Distance-based Outlier Detection ---")
+print(f"Original Data Count: {len(df)}")
+
+# Distance-based method (Z-score)
+mean = data_col.mean()
+std = data_col.std()
+threshold = 3 
+
+# Identify non-outliers
+df_clean = df[np.abs(data_col - mean) <= (threshold * std)]
+
+print(f"Data Count after Outlier Detection: {len(df_clean)}")
+
+
+################################################################################
+# EXPERIMENT 4: TIME SERIES FORECASTING (TREND & SEASONALITY)
+# Dataset: AirPassengers.csv
+################################################################################
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+df = pd.read_csv('AirPassengers.csv')
+df['Month'] = pd.to_datetime(df['Month'])
+df.set_index('Month', inplace=True)
+
+# Decomposition to show Trend and Seasonality
+result = seasonal_decompose(df['#Passengers'], model='multiplicative')
+
+print("\n--- Experiment 4: Time Series Forecasting ---")
+print("Displaying Trend and Seasonal plots...")
+result.trend.plot(title="Trend Component")
+plt.show()
+
+result.seasonal.plot(title="Seasonal Component")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 5: DATA SCIENCE LIFECYCLE
+# Dataset: netflix_titles.csv
+################################################################################
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# 1. Collection
+df = pd.read_csv('netflix_titles.csv')
+
+# 2. Cleaning (Lifecycle step)
+df_clean = df.dropna(subset=['country'])
+
+# 3. Analysis/Visualization (Lifecycle step)
+country_counts = df_clean['country'].value_counts().head(10)
+print("\n--- Experiment 5: Data Science Lifecycle ---")
+print("Top 10 Countries:\n", country_counts)
+
+country_counts.plot(kind='pie', autopct='%1.1f%%')
+plt.title("Data Science Lifecycle: Country Distribution")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 6: PERFORMANCE METRICS (HOUSING)
+# Dataset: housing.csv
+################################################################################
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Assuming no header as per the housing.csv image
+df = pd.read_csv('housing.csv', header=None)
+X = df.iloc[:, :-1]
+y = df.iloc[:, -1]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+model = LinearRegression().fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+print("\n--- Experiment 6: Performance Metrics (Housing) ---")
+print("MSE:", mean_squared_error(y_test, y_pred))
+print("R2 Score:", r2_score(y_test, y_pred))
+
+
+################################################################################
+# EXPERIMENT 7: PERFORMANCE METRICS (PLACEMENT)
+# Dataset: placement.csv
+################################################################################
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+df = pd.read_csv('placement.csv')
+X = df[['cgpa', 'placement_exam_marks']]
+y = df['placed']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+model = LogisticRegression().fit(X_train, y_train)
+
+print("\n--- Experiment 7: Performance Metrics (Placement) ---")
+print("Accuracy:", accuracy_score(y_test, model.predict(X_test)))
+print("Confusion Matrix:\n", confusion_matrix(y_test, model.predict(X_test)))
+
+
+################################################################################
+# EXPERIMENT 8: DATA IMPUTATION TECHNIQUE
+# Dataset: Automobile_data.csv
+################################################################################
+
+import pandas as pd
+import numpy as np
+
+df = pd.read_csv('Automobile_data.csv')
+
+# Replace '?' with NaN (as seen in your image)
+df.replace('?', np.nan, inplace=True)
+
+# Impute 'normalized-losses' with the mean
+df['normalized-losses'] = pd.to_numeric(df['normalized-losses'])
+print("\n--- Experiment 8: Data Imputation Technique ---")
+print("Nulls before:", df['normalized-losses'].isnull().sum())
+
+df['normalized-losses'].fillna(df['normalized-losses'].mean(), inplace=True)
+print("Nulls after imputation:", df['normalized-losses'].isnull().sum())
+
+
+################################################################################
+# EXPERIMENT 9: DATA VISUALIZATION (PLACEMENT)
+# Dataset: placement.csv
+################################################################################
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('placement.csv')
+
+# Visualizing placement based on CGPA and Exam Marks
+print("\n--- Experiment 9: Data Visualization (Placement) ---")
+sns.scatterplot(x='cgpa', y='placement_exam_marks', hue='placed', data=df)
+plt.title("Placement Data Visualization")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 10: OUTLIER DETECTION USING BOX PLOT
+# Dataset: tips.csv
+################################################################################
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('tips.csv')
+
+# Boxplot helps identify points outside the whiskers (outliers)
+print("\n--- Experiment 10: Outlier detection using Box Plot ---")
+sns.boxplot(x=df['total_bill'])
+plt.title("Box Plot for Outlier Detection")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 11: PYTHON PROGRAM FOR INFERENTIAL STATISTICS
+# Dataset: olympics.csv
+################################################################################
+
+import pandas as pd
+import scipy.stats as stats
+
+# Load the dataset
+# Skipping the first row because the image shows headers start on row 2
+df = pd.read_csv('olympics.csv', skiprows=1)
+
+# We want to infer if the average number of medals ('Combined total') 
+# is significantly different from a hypothetical value (e.g., 50)
+data = df['Combined total'].dropna()
+
+# 1. T-Test (One-sample)
+# Null Hypothesis (H0): The mean of medals is 50.
+# Alternative Hypothesis (H1): The mean of medals is NOT 50.
+t_stat, p_val = stats.ttest_1samp(data, popmean=50)
+
+print("\n--- Experiment 11: Inferential Statistics Results ---")
+print(f"Sample Mean: {data.mean()}")
+print(f"T-statistic: {t_stat}")
+print(f"P-value: {p_val}")
+
+# 2. Interpreting the result
+print("\n--- Inference ---")
+if p_val < 0.05:
+    print("Result: Significant. We reject the Null Hypothesis.")
+    print("Inference: The average number of medals is significantly different from 50.")
+else:
+    print("Result: Not Significant. We fail to reject the Null Hypothesis.")
+    print("Inference: There is no significant evidence that the average is different from 50.")
+
+# 3. Confidence Interval
+conf_int = stats.t.interval(0.95, len(data)-1, loc=data.mean(), scale=stats.sem(data))
+print(f"\n95% Confidence Interval for the mean: {conf_int}")
+
+
+################################################################################
+# EXPERIMENT 12: EXPLORATORY DATA ANALYSIS (EDA)
+# Dataset: Automobile_data.csv
+################################################################################
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+
+# 1. Load data and treat '?' as missing values
+df = pd.read_csv('Automobile_data.csv', na_values='?')
+
+# 2. Convert columns that should be numeric (like horsepower, price, etc.)
+# Errors='coerce' will turn any remaining non-numeric strings into NaN
+numeric_cols = ['horsepower', 'peak-rpm', 'price', 'bore', 'stroke']
+df[numeric_cols] = df[numeric_cols].apply(pd.to_numeric, errors='coerce')
+
+# 3. Handle the missing values (either drop them or fill them)
+df = df.dropna() 
+
+print("\n--- Experiment 12: EDA - Automobile Data Info ---")
+print(df.info())
+
+print("\n--- Correlation Heatmap ---")
+# Select only numeric columns for the heatmap to avoid errors
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title("Correlation Heatmap of Automobile Data")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 13: SCATTER PLOT AND CORRELATION
+# Dataset: mtcars.csv
+################################################################################
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('mtcars.csv')
+
+# Correlation between Horsepower and MPG
+corr = df['hp'].corr(df['mpg'])
+print("\n--- Experiment 13: Scatter Plot and Correlation ---")
+print(f"Correlation between HP and MPG: {corr}")
+
+sns.scatterplot(x='hp', y='mpg', data=df)
+plt.title(f"Scatter Plot (Corr: {round(corr, 2)})")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 14: CORRELATION IN TIPS DATASET
+# Dataset: tips.csv
+################################################################################
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Using tips columns for the logic
+df = pd.read_csv('tips.csv')
+
+print("\n--- Experiment 14: Visualizing Correlation ---")
+sns.regplot(x='total_bill', y='tip', data=df)
+plt.title("Visualizing Correlation: Bill vs Tip")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 15: VALIDATION & EVALUATION (DIABETES)
+# Dataset: diabetes.csv
+################################################################################
+
+import pandas as pd
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+
+df = pd.read_csv('diabetes.csv')
+X = df.drop('Outcome', axis=1)
+y = df['Outcome']
+
+# K-Fold Validation
+kf = KFold(n_splits=5)
+model = RandomForestClassifier()
+scores = cross_val_score(model, X, y, cv=kf)
+
+print("\n--- Experiment 15: Validation & Evaluation ---")
+print("Cross-Validation Scores:", scores)
+print("Average Accuracy:", scores.mean())
+
+
+################################################################################
+# EXPERIMENT 16: AUTOREGRESSION (AIR PASSENGERS)
+# Dataset: AirPassengers.csv
+################################################################################
+
+import pandas as pd
+from statsmodels.tsa.ar_model import AutoReg
+
+df = pd.read_csv('AirPassengers.csv')
+
+# Simple Autoregression
+model = AutoReg(df['#Passengers'], lags=1).fit()
+forecast = model.predict(start=len(df), end=len(df)+2)
+
+print("\n--- Experiment 16: Autoregression Predictions ---")
+print("Predictions for next 3 steps:\n", forecast)
+
+
+################################################################################
+# EXPERIMENT 17: ATTENDANCE PATTERNS
+# Dataset: attendance.csv
+################################################################################
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('attendance.csv')
+df['Date'] = pd.to_datetime(df['Date'], format='%Y%m%d')
+
+# Identifying seasonal patterns/anomalies
+print("\n--- Experiment 17: Attendance Pattern Over Time ---")
+df.set_index('Date')['Absent'].plot(kind='line', color='orange')
+plt.title("Attendance Pattern Over Time")
+plt.ylabel("Number of Absentees")
+plt.show()
+
+
+################################################################################
+# EXPERIMENT 18: DESCRIPTIVE ANALYSIS & CENTRAL TENDENCY
+# Dataset: Student_Marks.csv
+################################################################################
+
+import pandas as pd
+
+df = pd.read_csv('Student_Marks.csv')
+marks = df['Marks']
+
+print("\n--- Experiment 18: Descriptive Analysis & Central Tendency ---")
+print(f"Mean: {marks.mean()}")
+print(f"Median: {marks.median()}")
+
+skew = marks.skew()
+print(f"Skewness: {skew}")
+
+if skew > 0.5:
+    print("The dataset is Right Skewed.")
+elif skew < -0.5:
+    print("The dataset is Left Skewed.")
+else:
+    print("The dataset is Normal/Symmetric.")
