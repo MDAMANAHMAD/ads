@@ -108,26 +108,60 @@ plt.show()
 
 ################################################################################
 # EXPERIMENT 5: DATA SCIENCE LIFECYCLE
-# Dataset: netflix_titles.csv
+# Dataset: placement.csv
 ################################################################################
 
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
-# 1. Collection
-df = pd.read_csv('netflix_titles.csv')
+def run_practical():
+    try:
+        print("\n[STEP 1: DATA COLLECTION]")
+        df = pd.read_csv('placement.csv')
+        print(f"Dataset shape: {df.shape[0]} rows, {df.shape[1]} columns")
 
-# 2. Cleaning (Lifecycle step)
-df_clean = df.dropna(subset=['country'])
+        print("\n[STEP 2: DATA PREPROCESSING]")
+        missing = df.isnull().sum().sum()
+        print(f"Total Missing Values: {missing}")
 
-# 3. Analysis/Visualization (Lifecycle step)
-country_counts = df_clean['country'].value_counts().head(10)
-print("\n--- Experiment 5: Data Science Lifecycle ---")
-print("Top 10 Countries:\n", country_counts)
+        print("\n[STEP 3: EXPLORATORY DATA ANALYSIS (EDA)]")
+        print("Generating Graph... (Close the graph window to continue to next steps)")
+        
+        # Simple Scatter Plot using matplotlib
+        placed = df[df['placed'] == 1]
+        not_placed = df[df['placed'] == 0]
+        
+        plt.scatter(placed['cgpa'], placed['placement_exam_marks'], color='blue', label='Placed', alpha=0.6)
+        plt.scatter(not_placed['cgpa'], not_placed['placement_exam_marks'], color='red', label='Not Placed', alpha=0.6)
+        plt.xlabel('CGPA')
+        plt.ylabel('Exam Marks')
+        plt.title('EDA: CGPA vs Placement Exam Marks')
+        plt.legend()
+        plt.show() # Code pauses here until you close the graph window
 
-country_counts.plot(kind='pie', autopct='%1.1f%%')
-plt.title("Data Science Lifecycle: Country Distribution")
-plt.show()
+        print("\n[STEP 4: MODEL BUILDING]")
+        X = df[['cgpa', 'placement_exam_marks']]
+        y = df['placed']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        model = LogisticRegression()
+        model.fit(X_train, y_train)
+        print("Model Training Complete.")
+
+        print("\n[STEP 5: MODEL EVALUATION]")
+        y_pred = model.predict(X_test)
+        acc = accuracy_score(y_test, y_pred)
+        print(f"Final Model Accuracy: {acc*100:.2f}%\n")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    run_practical()
+
 
 
 ################################################################################
