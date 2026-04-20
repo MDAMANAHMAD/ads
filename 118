@@ -1,3 +1,5 @@
+# pip install pandas numpy matplotlib seaborn scipy scikit-learn imbalanced-learn statsmodels
+
 ################################################################################
 # EXPERIMENT 1: DESCRIPTIVE AND INFERENTIAL STATISTICS
 # Dataset: olympics.csv
